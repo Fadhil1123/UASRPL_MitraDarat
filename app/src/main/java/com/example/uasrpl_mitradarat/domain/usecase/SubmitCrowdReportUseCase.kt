@@ -3,6 +3,7 @@ package com.example.uasrpl_mitradarat.domain.usecase
 import com.example.uasrpl_mitradarat.domain.model.CrowdReport
 import com.example.uasrpl_mitradarat.domain.model.CrowdStatus
 import com.example.uasrpl_mitradarat.domain.repository.CrowdReportRepository
+import kotlinx.coroutines.flow.first
 import java.util.UUID
 
 class SubmitCrowdReportUseCase(
@@ -40,7 +41,7 @@ class SubmitCrowdReportUseCase(
 
         reportRepository.submitReport(report)
 
-        val activeReports = getActiveReportsUseCase(busId)
+        val activeReports = getActiveReportsUseCase(busId).first()
 
         val crowdStatus = calculateCrowdDensityUseCase(activeReports)
 
