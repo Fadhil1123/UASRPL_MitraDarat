@@ -27,7 +27,7 @@ class SubmitCrowdReportUseCase(
 
         if (!canSubmit) {
             return Result.failure(
-                Exception("Anda hanya dapat mengirim laporan setiap 10 menit")
+                Exception("Anda baru saja melapor. Silakan tunggu 2 menit untuk melapor kembali pada armada ini.")
             )
         }
 
