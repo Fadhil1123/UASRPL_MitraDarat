@@ -1,6 +1,5 @@
 package com.example.uasrpl_mitradarat.ui.splashscreen
 
-import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -21,7 +20,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
-import com.example.mitradarat.R
+import com.example.uasrpl_mitradarat.R
+
 
 @Composable
 fun SplashScreen(onLoadingFinished: () -> Unit = {}) {
