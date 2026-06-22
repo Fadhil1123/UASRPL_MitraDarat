@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.uasrpl_mitradarat.ui.splashscreen.SplashScreen
 import com.example.uasrpl_mitradarat.ui.dashboard.DashboardScreen
 import com.example.uasrpl_mitradarat.ui.temanbus.TemanBusScreen
 import com.example.uasrpl_mitradarat.ui.theme.UASRPL_MitraDaratTheme
@@ -18,12 +19,31 @@ class MainActivity : ComponentActivity() {
         setContent {
             UASRPL_MitraDaratTheme {
                 val navController = rememberNavController()
-                NavHost(navController = navController, startDestination = "dashboard") {
+
+                // 1. UBAH startDestination menjadi "splash"
+                NavHost(navController = navController, startDestination = "splash") {
+
+                    // 2. Daftarkan rute Splash Screen milikmu
+                    composable("splash") {
+                        SplashScreen(
+                            onLoadingFinished = {
+                                // Pindah ke dashboard setelah animasi loading selesai
+                                navController.navigate("dashboard") {
+                                    // Hancurkan splash screen dari riwayat agar user tidak bisa menekan tombol "Back" ke layar ini
+                                    popUpTo("splash") { inclusive = true }
+                                }
+                            }
+                        )
+                    }
+
+                    // Rute Dashboard (Kode asli temanmu)
                     composable("dashboard") {
                         DashboardScreen(
                             onTemanBusClick = { navController.navigate("teman_bus") }
                         )
                     }
+
+                    // Rute Teman Bus (Kode asli temanmu)
                     composable("teman_bus") {
                         TemanBusScreen(
                             onHomeClick = { navController.popBackStack() }
