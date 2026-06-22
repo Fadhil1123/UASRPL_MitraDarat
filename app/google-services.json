@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "558998848848",
+    "project_id": "mitra-darat-upgrade",
+    "storage_bucket": "mitra-darat-upgrade.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:558998848848:android:2182242527d8497ee79855",
+        "android_client_info": {
+          "package_name": "com.example.makeitso"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDxNkdVk4jTahVJCTAOO5fTIJIljjZ7kBc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:558998848848:android:2575f5cb389a209fe79855",
+        "android_client_info": {
+          "package_name": "com.example.uasrpl_mitradarat"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDxNkdVk4jTahVJCTAOO5fTIJIljjZ7kBc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
