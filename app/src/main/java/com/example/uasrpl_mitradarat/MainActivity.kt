@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+// Pastikan import ini sesuai dengan lokasi folder SplashScreen-mu
 import com.example.uasrpl_mitradarat.ui.splashscreen.SplashScreen
 import com.example.uasrpl_mitradarat.ui.dashboard.DashboardScreen
 import com.example.uasrpl_mitradarat.ui.temanbus.TemanBusScreen
