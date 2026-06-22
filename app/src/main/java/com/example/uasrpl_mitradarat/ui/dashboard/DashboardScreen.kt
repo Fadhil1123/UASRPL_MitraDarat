@@ -27,7 +27,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun DashboardScreen(
-    viewModel: DashboardViewModel = viewModel()
+    viewModel: DashboardViewModel = viewModel(),
+    onTemanBusClick: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -66,7 +67,13 @@ fun DashboardScreen(
                     FeaturesSection(
                         mainFeature = uiState.mainFeature,
                         features = uiState.features,
-                        onFeatureClick = { viewModel.onFeatureClick(it) }
+                        onFeatureClick = { id ->
+                            if (id == "teman_bus") {
+                                onTemanBusClick()
+                            } else {
+                                viewModel.onFeatureClick(id)
+                            }
+                        }
                     )
                     Spacer(modifier = Modifier.height(32.dp))
                 }
