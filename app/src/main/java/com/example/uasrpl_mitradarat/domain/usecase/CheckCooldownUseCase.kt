@@ -17,10 +17,10 @@ class CheckCooldownUseCase(
                 busId
             ) ?: return true
 
-        val tenMinutes =
-            10 * 60 * 1000L
+        val cooldownPeriod =
+            2 * 60 * 1000L
 
         return System.currentTimeMillis() -
-                latestReport.timestamp >= tenMinutes
+                latestReport.timestamp >= cooldownPeriod
     }
 }

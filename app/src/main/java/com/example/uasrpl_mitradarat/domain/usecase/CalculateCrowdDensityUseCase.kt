@@ -9,21 +9,22 @@ class CalculateCrowdDensityUseCase {
         reports: List<CrowdReport>
     ): CrowdStatus {
 
-        if (reports.isEmpty()) {
+        val validReports = reports.filter { it.status != CrowdStatus.NETRAL }
+
+        if (validReports.size < 3) {
             return CrowdStatus.NETRAL
         }
 
-        val total = reports.sumOf {
-
+        val total = validReports.sumOf {
             when (it.status) {
                 CrowdStatus.LONGGAR -> 1
                 CrowdStatus.SEDANG -> 2
                 CrowdStatus.PADAT -> 3
-                CrowdStatus.NETRAL -> 0
+                CrowdStatus.NETRAL -> 0 // Harusnya tidak tercapai karena sudah difilter
             }
         }
 
-        val average = total.toDouble() / reports.size
+        val average = total.toDouble() / validReports.size
 
         return when {
             average <= 1.66 -> CrowdStatus.LONGGAR

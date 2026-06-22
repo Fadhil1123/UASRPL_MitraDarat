@@ -18,9 +18,9 @@ class GetActiveReportsUseCase(
             System.currentTimeMillis() -
                     (10 * 60 * 1000)
 
-        return reports.filter {
-
-            it.timestamp >= threshold
-        }
+        return reports
+            .filter { it.timestamp >= threshold }
+            .sortedByDescending { it.timestamp }
+            .distinctBy { it.userId }
     }
 }
