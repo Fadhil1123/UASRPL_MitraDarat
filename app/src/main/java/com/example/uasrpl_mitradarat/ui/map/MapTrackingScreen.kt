@@ -113,7 +113,7 @@ fun MapTrackingScreen() {
                             item
                         }
                     }
-                    showDialog = false 
+                    showDialog = false
                 }
             )
         }

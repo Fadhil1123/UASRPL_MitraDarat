@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.example.uasrpl_mitradarat" />
+                  <option name="mobileSdkAppId" value="1:558998848848:android:2575f5cb389a209fe79855" />
+                  <option name="projectId" value="mitra-darat-upgrade" />
+                  <option name="projectNumber" value="558998848848" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
