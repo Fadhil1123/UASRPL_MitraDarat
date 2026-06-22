@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import com.example.uasrpl_mitradarat.R
 
+
 @Composable
 fun SplashScreen(onLoadingFinished: () -> Unit = {}) {
     var progress by remember { mutableFloatStateOf(0f) }
