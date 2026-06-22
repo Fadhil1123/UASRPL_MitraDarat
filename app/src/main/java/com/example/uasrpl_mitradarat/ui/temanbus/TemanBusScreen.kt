@@ -18,11 +18,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.foundation.clickable
 
 @Composable
 fun TemanBusScreen(
     viewModel: TemanBusViewModel = viewModel(),
-    onHomeClick: () -> Unit
+    onHomeClick: () -> Unit,
+    onBusClick: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -96,7 +98,7 @@ fun TemanBusScreen(
                         contentPadding = PaddingValues(bottom = 24.dp)
                     ) {
                         items(uiState.busList) { bus ->
-                            BusCard(bus)
+                            BusCard(bus = bus, onClick = onBusClick)
                         }
                     }
                 }
@@ -137,15 +139,18 @@ fun TemanBusHeader() {
     }
 }
 
+// Tambahkan parameter onClick
 @Composable
-fun BusCard(bus: TemanBusItem) {
+fun BusCard(bus: TemanBusItem, onClick: () -> Unit) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .height(180.dp),
+            .height(180.dp)
+            .clickable { onClick() }, // INI KUNCINYA! Biar kartunya bisa ditekan
         shape = RoundedCornerShape(16.dp),
         shadowElevation = 2.dp
     ) {
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -226,5 +231,8 @@ fun TemanBusBottomBar(onHomeClick: () -> Unit) {
 @androidx.compose.ui.tooling.preview.Preview(showBackground = true)
 @Composable
 fun TemanBusScreenPreview() {
-    TemanBusScreen(onHomeClick = {})
+    TemanBusScreen(
+        onHomeClick = {},
+        onBusClick = {} // Tambahkan baris ini agar Preview tidak error lagi
+    )
 }
