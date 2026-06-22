@@ -12,6 +12,8 @@ import com.example.uasrpl_mitradarat.ui.splashscreen.SplashScreen
 import com.example.uasrpl_mitradarat.ui.dashboard.DashboardScreen
 import com.example.uasrpl_mitradarat.ui.temanbus.TemanBusScreen
 import com.example.uasrpl_mitradarat.ui.theme.UASRPL_MitraDaratTheme
+import com.example.uasrpl_mitradarat.ui.map.MapTrackingScreen
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,11 +46,16 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
-                    // Rute Teman Bus (Kode asli temanmu)
-                    composable("teman_bus") {
+                    // Rute Teman Bus
+                    composable(route = "teman_bus") {
                         TemanBusScreen(
-                            onHomeClick = { navController.popBackStack() }
+                            onHomeClick = { navController.popBackStack() },
+                            onBusClick = { navController.navigate("map_tracking") } // TAMBAHKAN BARIS INI!
                         )
+                    }
+
+                    composable("map_tracking") {
+                        MapTrackingScreen()
                     }
                 }
             }
