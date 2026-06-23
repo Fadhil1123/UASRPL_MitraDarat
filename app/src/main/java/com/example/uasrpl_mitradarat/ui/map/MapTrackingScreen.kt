@@ -15,23 +15,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.uasrpl_mitradarat.R
 
 @Composable
-fun MapTrackingScreen() {
-    var selectedHalte by remember { mutableStateOf("Pilih Stasiun") }
-    val isStationSelected = selectedHalte != "Pilih Stasiun"
+fun MapTrackingScreen(
+    viewModel: MapTrackingViewModel = viewModel(factory = MapTrackingViewModel.Factory)
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    
+    val isStationSelected = uiState.selectedHalte != "Pilih Stasiun"
 
-    var showDialog by remember { mutableStateOf(false) }
-    var clickedBusIndex by remember { mutableStateOf(-1) }
-
-    var currentBusList by remember { mutableStateOf(listOf<BusArrivalItem>()) }
-
-    LaunchedEffect(selectedHalte) {
-        currentBusList = getBusDataForStation(selectedHalte)
-    }
-
-    val mapImageResource = when (selectedHalte) {
+    val mapImageResource = when (uiState.selectedHalte) {
         "Halte Taman Siring Kilometer 0" -> R.drawable.map_siring
         "Terminal Induk KM 6" -> R.drawable.map_km6
         "Terminal Gambut Barakat" -> R.drawable.map_gambut
@@ -48,8 +43,8 @@ fun MapTrackingScreen() {
         )
 
         FloatingStationSelector(
-            selectedHalte = selectedHalte,
-            onHalteSelected = { halte -> selectedHalte = halte },
+            selectedHalte = uiState.selectedHalte,
+            onHalteSelected = { halte -> viewModel.onHalteSelected(halte) },
             modifier = Modifier
                 .align(Alignment.TopCenter)
                 .padding(top = 48.dp, start = 20.dp, end = 20.dp)
@@ -57,7 +52,7 @@ fun MapTrackingScreen() {
 
         if (isStationSelected) {
             FloatingActionButton(
-                onClick = { selectedHalte = "Pilih Stasiun" },
+                onClick = { viewModel.onHalteSelected("Pilih Stasiun") },
                 shape = CircleShape,
                 containerColor = Color.White,
                 contentColor = Color.Black,
@@ -83,37 +78,20 @@ fun MapTrackingScreen() {
             }
 
             BusArrivalInfoSheet(
-                stationName = selectedHalte,
-                busList = currentBusList,
+                stationName = uiState.selectedHalte,
+                busList = uiState.busArrivalList,
                 onStatusClick = { index ->
-                    clickedBusIndex = index
-                    showDialog = true
+                    viewModel.onStatusClick(index)
                 },
                 modifier = Modifier.align(Alignment.BottomCenter)
             )
         }
 
-        if (showDialog) {
+        if (uiState.isDialogShown) {
             DensityInputDialog(
-                onDismiss = { showDialog = false },
+                onDismiss = { viewModel.onDialogDismiss() },
                 onStatusSelected = { statusTerpilih ->
-                    val warnaBaru = when (statusTerpilih) {
-                        "Longgar" -> Color(0xFF28A745)
-                        "Sedang" -> Color(0xFFFFC107)
-                        else -> Color(0xFFDC3545)
-                    }
-
-                    currentBusList = currentBusList.mapIndexed { index, item ->
-                        if (index == clickedBusIndex) {
-                            item.copy(
-                                statusText = statusTerpilih,
-                                statusColor = warnaBaru
-                            )
-                        } else {
-                            item
-                        }
-                    }
-                    showDialog = false
+                    viewModel.onStatusSelected(statusTerpilih)
                 }
             )
         }
