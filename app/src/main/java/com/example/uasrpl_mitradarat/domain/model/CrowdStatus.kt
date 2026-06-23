@@ -4,5 +4,5 @@ enum class CrowdStatus {
     LONGGAR,
     SEDANG,
     PADAT,
-    NETRAL
+    BELUM_ADA_DATA
 }
