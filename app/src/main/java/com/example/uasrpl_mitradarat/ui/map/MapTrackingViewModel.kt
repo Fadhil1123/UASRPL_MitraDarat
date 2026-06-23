@@ -10,6 +10,7 @@ import com.example.uasrpl_mitradarat.MitraDaratApplication
 import com.example.uasrpl_mitradarat.domain.model.CrowdStatus
 import com.example.uasrpl_mitradarat.domain.usecase.ObserveBusCrowdStatusUseCase
 import com.example.uasrpl_mitradarat.domain.usecase.SubmitCrowdReportUseCase
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,7 +22,8 @@ data class MapTrackingUiState(
     val selectedHalte: String = "Pilih Stasiun",
     val busArrivalList: List<BusArrivalItem> = emptyList(),
     val isDialogShown: Boolean = false,
-    val selectedBusIndex: Int = -1
+    val selectedBusIndex: Int = -1,
+    val toastMessage: String? = null
 )
 
 class MapTrackingViewModel(
@@ -29,8 +31,12 @@ class MapTrackingViewModel(
     private val observeBusCrowdStatusUseCase: ObserveBusCrowdStatusUseCase
 ) : ViewModel() {
 
+    private val currentUserId = "user_${UUID.randomUUID().toString().take(6)}"
+
     private val _uiState = MutableStateFlow(MapTrackingUiState())
     val uiState: StateFlow<MapTrackingUiState> = _uiState.asStateFlow()
+
+    private var observeBusesJob: Job? = null
 
     fun onHalteSelected(halte: String) {
         _uiState.update { it.copy(selectedHalte = halte) }
@@ -38,31 +44,68 @@ class MapTrackingViewModel(
     }
 
     private fun loadBusArrivals(halte: String) {
+        observeBusesJob?.cancel()
+
         val warnaHijau = Color(0xFF28A745)
         val warnaKuning = Color(0xFFFFC107)
         val warnaMerah = Color(0xFFDC3545)
+        val warnaAbu = Color.Gray
 
-        val mockBuses = when (halte) {
+        val baseBuses = when (halte) {
             "Halte Taman Siring Kilometer 0" -> listOf(
-                BusArrivalItem("K1A", warnaHijau, "3", "TB IA 05", "Siring KM 0 > Kayu Tangi", "Longgar", warnaHijau),
-                BusArrivalItem("K1B", warnaKuning, "8", "TB IIB 01", "Siring KM 0 > Sentra Antasari", "Sedang", warnaKuning)
+                BusArrivalItem("K1A", warnaHijau, "3", "TB IA 05", "Siring KM 0 > Kayu Tangi", "Mencari data...", warnaAbu),
+                BusArrivalItem("K1B", warnaKuning, "8", "TB IIB 01", "Siring KM 0 > Sentra Antasari", "Mencari data...", warnaAbu)
             )
             "Terminal Induk KM 6" -> listOf(
-                BusArrivalItem("K2", warnaHijau, "1", "TB IC 03", "Terminal Induk KM 6 > RSUD Ulin A", "Longgar", warnaHijau),
-                BusArrivalItem("K1B", warnaKuning, "1", "TB IB 02", "Polresta > RSUD Ulin A", "Sedang", warnaKuning),
-                BusArrivalItem("K1B", warnaMerah, "5", "TB IB 01", "Terminal Induk KM 6 > Dharma P...", "Padat", warnaMerah)
+                BusArrivalItem("K2", warnaHijau, "1", "TB IC 03", "Terminal Induk KM 6 > RSUD Ulin A", "Mencari data...", warnaAbu),
+                BusArrivalItem("K1B", warnaKuning, "1", "TB IB 02", "Polresta > RSUD Ulin A", "Mencari data...", warnaAbu),
+                BusArrivalItem("K1B", warnaMerah, "5", "TB IB 01", "Terminal Induk KM 6 > Dharma P...", "Mencari data...", warnaAbu)
             )
             "Terminal Gambut Barakat" -> listOf(
-                BusArrivalItem("K4", warnaMerah, "4", "TB IIA 12", "Gambut Barakat > KM 6", "Padat", warnaMerah),
-                BusArrivalItem("K3", warnaHijau, "12", "TB IIIA 04", "Gambut Barakat > Handil Bakti", "Longgar", warnaHijau)
+                BusArrivalItem("K4", warnaMerah, "4", "TB IIA 12", "Gambut Barakat > KM 6", "Mencari data...", warnaAbu),
+                BusArrivalItem("K3", warnaHijau, "12", "TB IIIA 04", "Gambut Barakat > Handil Bakti", "Mencari data...", warnaAbu)
             )
             "Terminal Simpang Empat Banjarbaru" -> listOf(
-                BusArrivalItem("K1A", warnaKuning, "6", "TB IIA 09", "Banjarbaru > Gambut Barakat", "Sedang", warnaKuning),
-                BusArrivalItem("K1B", warnaHijau, "15", "TB IVA 02", "Banjarbaru > Martapura", "Longgar", warnaHijau)
+                BusArrivalItem("K1A", warnaKuning, "6", "TB IIA 09", "Banjarbaru > Gambut Barakat", "Mencari data...", warnaAbu),
+                BusArrivalItem("K1B", warnaHijau, "15", "TB IVA 02", "Banjarbaru > Martapura", "Mencari data...", warnaAbu)
             )
             else -> emptyList()
         }
-        _uiState.update { it.copy(busArrivalList = mockBuses) }
+
+        _uiState.update { it.copy(busArrivalList = baseBuses) }
+        if (baseBuses.isEmpty()) return
+
+        observeBusesJob = viewModelScope.launch {
+            baseBuses.forEachIndexed { index, bus ->
+                launch {
+                    observeBusCrowdStatusUseCase(bus.busCode).collect { liveStatus ->
+                        val statusName = when (liveStatus) {
+                            CrowdStatus.LONGGAR -> "Longgar"
+                            CrowdStatus.SEDANG -> "Sedang"
+                            CrowdStatus.PADAT -> "Padat"
+                            CrowdStatus.BELUM_ADA_DATA -> "Belum Ada Data"
+                        }
+                        val color = when (liveStatus) {
+                            CrowdStatus.LONGGAR -> warnaHijau
+                            CrowdStatus.SEDANG -> warnaKuning
+                            CrowdStatus.PADAT -> warnaMerah
+                            CrowdStatus.BELUM_ADA_DATA -> warnaAbu
+                        }
+
+                        _uiState.update { state ->
+                            val updatedList = state.busArrivalList.toMutableList()
+                            if (index < updatedList.size && updatedList[index].busCode == bus.busCode) {
+                                updatedList[index] = updatedList[index].copy(
+                                    statusText = statusName,
+                                    statusColor = color
+                                )
+                            }
+                            state.copy(busArrivalList = updatedList)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     fun onStatusClick(index: Int) {
@@ -71,6 +114,10 @@ class MapTrackingViewModel(
 
     fun onDialogDismiss() {
         _uiState.update { it.copy(isDialogShown = false) }
+    }
+
+    fun clearToast() {
+        _uiState.update { it.copy(toastMessage = null) }
     }
 
     fun onStatusSelected(statusName: String) {
@@ -85,32 +132,35 @@ class MapTrackingViewModel(
             else -> CrowdStatus.BELUM_ADA_DATA
         }
 
-        val color = when (statusName) {
-            "Longgar" -> Color(0xFF28A745)
-            "Sedang" -> Color(0xFFFFC107)
-            else -> Color(0xFFDC3545)
-        }
-
         viewModelScope.launch {
-            // Simplified busId mapping for demo purposes
-            val busId = bus.busCode 
-            
-            val result = submitCrowdReportUseCase(
-                userId = "currentUser", // Should be actual userId
-                busId = busId,
-                status = status
-            )
+            val busId = bus.busCode
 
-            if (result.isSuccess) {
-                // Update Local UI (or ideally observe through the flow)
-                _uiState.update { state ->
-                    val newList = state.busArrivalList.toMutableList()
-                    newList[index] = newList[index].copy(statusText = statusName, statusColor = color)
-                    state.copy(busArrivalList = newList, isDialogShown = false)
+            try {
+                val result = submitCrowdReportUseCase(
+                    userId = currentUserId,
+                    busId = busId,
+                    status = status
+                )
+
+                if (result.isSuccess) {
+                    _uiState.update {
+                        it.copy(
+                            isDialogShown = false,
+                            toastMessage = "Laporan berhasil dikirim! Menghitung validitas data..."
+                        )
+                    }
+                } else {
+                    val errorMsg = result.exceptionOrNull()?.message ?: "Gagal mengirim laporan"
+                    _uiState.update { it.copy(isDialogShown = false, toastMessage = errorMsg) }
                 }
-            } else {
-                // Here we would ideally show a Toast/Snackbar with result.exceptionOrNull()?.message
-                _uiState.update { it.copy(isDialogShown = false) }
+            } catch (e: Exception) {
+                val errorLog = e.localizedMessage ?: "Terjadi kesalahan koneksi database write."
+                _uiState.update {
+                    it.copy(
+                        isDialogShown = false,
+                        toastMessage = "Firebase Error: $errorLog"
+                    )
+                }
             }
         }
     }

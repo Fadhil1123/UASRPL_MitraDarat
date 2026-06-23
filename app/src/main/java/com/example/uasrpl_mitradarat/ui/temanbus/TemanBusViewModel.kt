@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.uasrpl_mitradarat.MitraDaratApplication
+import com.example.uasrpl_mitradarat.R
 import com.example.uasrpl_mitradarat.domain.model.Bus
 import com.example.uasrpl_mitradarat.domain.repository.BusRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,14 +32,13 @@ class TemanBusViewModel(
     private fun observeBuses() {
         busRepository.getAllBuses()
             .onEach { buses ->
-                _uiState.update { it.copy(busList = buses.map { bus -> bus.toUiItem() }) }
+                val uniqueBuses = buses.distinctBy { it.busName }.map { bus -> bus.toUiItem() }
+                _uiState.update { it.copy(busList = uniqueBuses) }
             }
             .launchIn(viewModelScope)
     }
 
     private fun Bus.toUiItem(): TemanBusItem {
-        // Map data from Firestore model to UI model
-        // Using some deterministic gradients based on busId or name for now
         val gradient = when (busName) {
             "Batik Solo Trans" -> Brush.verticalGradient(listOf(Color(0xFFFFE0B2), Color(0xFFFFFFFF)))
             "Metro Jabar Trans" -> Brush.verticalGradient(listOf(Color(0xFFE8F5E9), Color(0xFFFFFFFF)))
@@ -49,12 +49,22 @@ class TemanBusViewModel(
             else -> Brush.verticalGradient(listOf(Color(0xFFF5F5F5), Color(0xFFFFFFFF)))
         }
 
+        val logo = when (busName) {
+            "Batik Solo Trans" -> R.drawable.satu
+            "Trans Banjarbakula" -> R.drawable.dua
+            "Balikpapan City Trans" -> R.drawable.empat
+            "Metro Jabar Trans" -> R.drawable.tiga
+            "Trans Manado" -> R.drawable.lima
+            else -> R.drawable.enam
+        }
+
         return TemanBusItem(
             id = busId,
-            cityName = "Kota Info", // Should ideally be in the Bus model
+            cityName = "Kota Info",
             busName = busName,
-            routeCount = 5, // Mock value or should be in the Bus model
-            backgroundGradient = gradient
+            routeCount = 5,
+            backgroundGradient = gradient,
+            logoRes = logo
         )
     }
 
