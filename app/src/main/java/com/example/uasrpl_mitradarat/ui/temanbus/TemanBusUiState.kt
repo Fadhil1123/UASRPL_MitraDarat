@@ -13,5 +13,6 @@ data class TemanBusItem(
     val cityName: String,
     val busName: String,
     val routeCount: Int,
-    val backgroundGradient: Brush
+    val backgroundGradient: Brush,
+    val logoRes: Int
 )

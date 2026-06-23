@@ -1,5 +1,7 @@
 package com.example.uasrpl_mitradarat.ui.dashboard
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -15,15 +17,19 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.uasrpl_mitradarat.R
 
 @Composable
 fun DashboardScreen(
@@ -43,27 +49,30 @@ fun DashboardScreen(
                 .padding(innerPadding)
                 .background(
                     brush = Brush.verticalGradient(
-                        colors = listOf(Color(0xFF0052CC), Color(0xFF007BFF), Color(0xFFF5F7FA)),
+                        colors = listOf(Color(0xFF0A2585), Color(0xFF1353D8), Color(0xFF1E70F2)),
                         startY = 0f,
-                        endY = 1200f
+                        endY = 1000f
                     )
                 )
         ) {
-            HeaderSection(uiState.quickTrackingList)
-            
+            HeaderSection(quickTrackingList = uiState.quickTrackingList)
+
+            // KUNCI REVISI UTAMA: Diberi padding dan shape membulat penuh di semua sisi
+            // agar panel putih melayang dan gradasi biru di latar belakang terlihat 100% sama dengan Figma
             Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = Color(0xFFF5F7FA),
-                shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                color = Color(0xFFF6F9FF),
+                shape = RoundedCornerShape(28.dp)
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(16.dp)
+                        .padding(horizontal = 20.dp, vertical = 20.dp)
                         .verticalScroll(rememberScrollState())
                 ) {
-                    ActionButtonsSection()
-                    Spacer(modifier = Modifier.height(24.dp))
                     FeaturesSection(
                         mainFeature = uiState.mainFeature,
                         features = uiState.features,
@@ -75,7 +84,6 @@ fun DashboardScreen(
                             }
                         }
                     )
-                    Spacer(modifier = Modifier.height(32.dp))
                 }
             }
         }
@@ -87,19 +95,20 @@ fun HeaderSection(quickTrackingList: List<QuickTrackingItem>) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 16.dp)
+            .padding(horizontal = 24.dp, vertical = 16.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // REVISI LOGO: Menggabungkan drawable ikon dengan teks putih MitraDarat berdampingan
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Default.DirectionsBus,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(28.dp)
+                Image(
+                    painter = painterResource(id = R.drawable.logo),
+                    contentDescription = "Logo Icon",
+                    modifier = Modifier.size(28.dp),
+                    contentScale = ContentScale.Fit
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
@@ -112,12 +121,13 @@ fun HeaderSection(quickTrackingList: List<QuickTrackingItem>) {
             Icon(
                 imageVector = Icons.Default.Notifications,
                 contentDescription = "Notifications",
-                tint = Color.White
+                tint = Color.White,
+                modifier = Modifier.size(24.dp)
             )
         }
-        
+
         Spacer(modifier = Modifier.height(24.dp))
-        
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -125,7 +135,7 @@ fun HeaderSection(quickTrackingList: List<QuickTrackingItem>) {
         ) {
             Text(
                 text = "Quick Tracking",
-                color = Color.White,
+                color = Color.White.copy(alpha = 0.9f),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold
             )
@@ -136,17 +146,20 @@ fun HeaderSection(quickTrackingList: List<QuickTrackingItem>) {
                 modifier = Modifier.size(16.dp)
             )
         }
-        
+
         Spacer(modifier = Modifier.height(12.dp))
-        
+
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
-            contentPadding = PaddingValues(bottom = 8.dp)
+            modifier = Modifier.fillMaxWidth()
         ) {
             items(quickTrackingList) { item ->
                 QuickTrackingCard(item)
             }
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+        ActionButtonsSection()
     }
 }
 
@@ -154,10 +167,12 @@ fun HeaderSection(quickTrackingList: List<QuickTrackingItem>) {
 fun QuickTrackingCard(item: QuickTrackingItem) {
     Surface(
         shape = RoundedCornerShape(16.dp),
-        color = Color.White.copy(alpha = 0.15f),
+        color = Color.White.copy(alpha = 0.12f),
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.18f)),
         modifier = Modifier
             .width(220.dp)
-            .clickable { /* No action yet */ }
+            .height(74.dp)
+            .clickable { }
     ) {
         Row(
             modifier = Modifier.padding(12.dp),
@@ -165,36 +180,26 @@ fun QuickTrackingCard(item: QuickTrackingItem) {
         ) {
             Box(
                 modifier = Modifier
-                    .size(36.dp)
-                    .background(Color.White.copy(alpha = 0.2f), RoundedCornerShape(8.dp)),
+                    .size(38.dp)
+                    .background(Color.White.copy(alpha = 0.2f), RoundedCornerShape(10.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = item.icon,
+                Image(
+                    painter = painterResource(id = item.iconRes),
                     contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(22.dp)
                 )
             }
             Spacer(modifier = Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = item.title,
-                    color = Color.White,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = item.subtitle,
-                    color = Color.White.copy(alpha = 0.7f),
-                    fontSize = 10.sp
-                )
+                Text(text = item.title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp, maxLines = 1)
+                Text(text = item.subtitle, color = Color.White.copy(alpha = 0.7f), fontSize = 11.sp, maxLines = 1)
             }
             Icon(
                 imageVector = Icons.Default.ChevronRight,
                 contentDescription = null,
                 tint = Color.White,
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(16.dp)
             )
         }
     }
@@ -204,62 +209,40 @@ fun QuickTrackingCard(item: QuickTrackingItem) {
 fun ActionButtonsSection() {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        ActionButton(
-            icon = Icons.Default.MyLocation,
-            label = "Tracking Bus",
-            modifier = Modifier.weight(1f)
-        )
-        ActionButton(
-            icon = Icons.Default.Category,
-            label = "Tools",
-            modifier = Modifier.weight(1f),
-            hasBadge = true
-        )
+        // REVISI IKON: Sekarang murni memakai ikon Bus bawaan Material, bukan target lokasi lagi
+        ActionButton(icon = Icons.Default.DirectionsBus, label = "Tracking Bus", modifier = Modifier.wrapContentWidth())
+        ActionButton(icon = Icons.Default.Widgets, label = "Tools", modifier = Modifier.wrapContentWidth(), hasBadge = true)
     }
 }
 
 @Composable
 fun ActionButton(icon: ImageVector, label: String, modifier: Modifier, hasBadge: Boolean = false) {
     Surface(
-        onClick = { /* Not active yet */ },
-        modifier = modifier.height(56.dp),
-        shape = RoundedCornerShape(12.dp),
-        color = Color.White,
-        shadowElevation = 1.dp
+        onClick = { },
+        modifier = modifier.height(38.dp),
+        shape = CircleShape,
+        color = Color.White.copy(alpha = 0.15f),
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.1f))
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 12.dp),
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = Color(0xFF0052CC),
-                modifier = Modifier.size(22.dp)
-            )
+            Icon(imageVector = icon, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
             Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = label,
-                color = Color.Black,
-                fontSize = 13.sp,
-                fontWeight = FontWeight.SemiBold
-            )
+            Text(text = label, color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Medium)
             if (hasBadge) {
                 Spacer(modifier = Modifier.width(6.dp))
-                Surface(
-                    color = Color(0xFFFFD700),
-                    shape = RoundedCornerShape(4.dp)
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(Color(0xFFF97316))
+                        .padding(horizontal = 5.dp, vertical = 1.dp)
                 ) {
-                    Text(
-                        text = "NEW",
-                        fontSize = 8.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
-                        color = Color.Black
-                    )
+                    Text(text = "NEW", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = Color.White)
                 }
             }
         }
@@ -273,19 +256,13 @@ fun FeaturesSection(
     onFeatureClick: (String) -> Unit
 ) {
     Column {
-        Text(
-            text = "MitraDarat Feature",
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black
-        )
-        
+        Text(text = "MitraDarat Feature", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1E293B))
+
         Spacer(modifier = Modifier.height(16.dp))
-        
-        // Main Feature Card (Bus Pariwisata)
+
         mainFeature?.let { feature ->
             Surface(
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(16.dp),
                 color = Color.White,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -299,87 +276,68 @@ fun FeaturesSection(
                     Box(
                         modifier = Modifier
                             .size(44.dp)
-                            .background(feature.color.copy(alpha = 0.1f), CircleShape),
+                            .background(Color(0xFFE2EBFB), CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(
-                            imageVector = feature.icon,
+                        Image(
+                            painter = painterResource(id = feature.iconRes),
                             contentDescription = null,
-                            tint = feature.color,
                             modifier = Modifier.size(24.dp)
                         )
                     }
                     Spacer(modifier = Modifier.width(16.dp))
                     Column {
-                        Text(
-                            text = feature.name,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 15.sp
-                        )
-                        Text(
-                            text = feature.subtitle,
-                            fontSize = 12.sp,
-                            color = Color.Gray
-                        )
+                        Text(text = feature.name, fontWeight = FontWeight.Bold, fontSize = 15.sp, color = Color(0xFF0F172A))
+                        Text(text = feature.subtitle, fontSize = 12.sp, color = Color.Gray)
                     }
                 }
             }
         }
-        
+
         Spacer(modifier = Modifier.height(24.dp))
-        
-        // Features Grid
+
         features.chunked(3).forEach { rowItems ->
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 12.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 rowItems.forEach { feature ->
                     FeatureGridItem(
-                        feature = feature, 
-                        modifier = Modifier.weight(1f),
+                        feature = feature,
                         onClick = { onFeatureClick(feature.id) }
                     )
                 }
             }
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
 
 @Composable
 fun FeatureGridItem(
-    feature: FeatureItem, 
-    modifier: Modifier = Modifier,
+    feature: FeatureItem,
     onClick: () -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.clickable { onClick() }
+        modifier = Modifier.width(90.dp)
     ) {
-        Surface(
-            modifier = Modifier.size(60.dp),
-            shape = RoundedCornerShape(16.dp),
-            color = feature.color
-        ) {
-            Box(contentAlignment = Alignment.Center) {
-                Icon(
-                    imageVector = feature.icon,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(30.dp)
-                )
-            }
-        }
-        Spacer(modifier = Modifier.height(8.dp))
+        Image(
+            painter = painterResource(id = feature.iconRes),
+            contentDescription = feature.name,
+            modifier = Modifier
+                .size(76.dp)
+                .clickable { onClick() },
+            contentScale = ContentScale.Fit
+        )
+        Spacer(modifier = Modifier.height(6.dp))
         Text(
             text = feature.name,
-            fontSize = 11.sp,
+            fontSize = 12.sp,
             textAlign = TextAlign.Center,
-            fontWeight = FontWeight.Medium,
-            lineHeight = 14.sp,
-            color = Color.Black.copy(alpha = 0.8f)
+            fontWeight = FontWeight.SemiBold,
+            maxLines = 1,
+            color = Color(0xFF334155)
         )
     }
 }
@@ -396,11 +354,11 @@ fun BottomNavigationBar() {
             icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
             label = { Text("Home") },
             colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color(0xFF0052CC),
-                selectedTextColor = Color(0xFF0052CC),
+                selectedIconColor = Color(0xFF1353D8),
+                selectedTextColor = Color(0xFF1353D8),
                 unselectedIconColor = Color.Gray,
                 unselectedTextColor = Color.Gray,
-                indicatorColor = Color.Transparent
+                indicatorColor = Color(0xFFE2EBFB)
             )
         )
         NavigationBarItem(

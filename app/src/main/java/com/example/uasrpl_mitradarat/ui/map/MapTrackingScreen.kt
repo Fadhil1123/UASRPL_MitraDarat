@@ -1,5 +1,6 @@
 package com.example.uasrpl_mitradarat.ui.map
 
+import android.widget.Toast // Tambahan import untuk memunculkan Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -13,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext // Tambahan import untuk mengambil Context
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -22,8 +24,17 @@ import com.example.uasrpl_mitradarat.R
 fun MapTrackingScreen(
     viewModel: MapTrackingViewModel = viewModel(factory = MapTrackingViewModel.Factory)
 ) {
+    val context = LocalContext.current // 1. Ambil konteks aplikasi untuk wadah Toast
     val uiState by viewModel.uiState.collectAsState()
-    
+
+    // 2. KUNCI NOTIFIKASI COOLDOWN: Selipkan fungsi pemantau ini di sini
+    LaunchedEffect(uiState.toastMessage) {
+        uiState.toastMessage?.let { pesan ->
+            Toast.makeText(context, pesan, Toast.LENGTH_LONG).show()
+            viewModel.clearToast() // Bersihkan pesan agar tidak muncul berulang saat recompose
+        }
+    }
+
     val isStationSelected = uiState.selectedHalte != "Pilih Stasiun"
 
     val mapImageResource = when (uiState.selectedHalte) {
