@@ -9,10 +9,12 @@ class CalculateCrowdDensityUseCase {
         reports: List<CrowdReport>
     ): CrowdStatus {
 
-        val validReports = reports.filter { it.status != CrowdStatus.NETRAL }
+        val validReports = reports.filter { 
+            it.status != CrowdStatus.BELUM_ADA_DATA 
+        }
 
         if (validReports.size < 3) {
-            return CrowdStatus.NETRAL
+            return CrowdStatus.BELUM_ADA_DATA
         }
 
         val total = validReports.sumOf {
@@ -20,7 +22,7 @@ class CalculateCrowdDensityUseCase {
                 CrowdStatus.LONGGAR -> 1
                 CrowdStatus.SEDANG -> 2
                 CrowdStatus.PADAT -> 3
-                CrowdStatus.NETRAL -> 0 // Harusnya tidak tercapai karena sudah difilter
+                else -> 0
             }
         }
 

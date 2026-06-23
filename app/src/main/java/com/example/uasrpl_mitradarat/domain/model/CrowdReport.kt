@@ -4,6 +4,6 @@ data class CrowdReport(
     val reportId: String = "",
     val busId: String = "",
     val userId: String = "",
-    val status: CrowdStatus = CrowdStatus.NETRAL,
+    val status: CrowdStatus = CrowdStatus.BELUM_ADA_DATA,
     val timestamp: Long = 0L
 )

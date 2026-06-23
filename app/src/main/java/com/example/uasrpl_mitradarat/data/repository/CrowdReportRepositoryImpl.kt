@@ -2,7 +2,9 @@ package com.example.uasrpl_mitradarat.data.repository
 
 import com.example.uasrpl_mitradarat.data.remote.CrowdReportDataSource
 import com.example.uasrpl_mitradarat.domain.model.CrowdReport
+import com.example.uasrpl_mitradarat.domain.model.CrowdStatus
 import com.example.uasrpl_mitradarat.domain.repository.CrowdReportRepository
+import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -38,7 +40,7 @@ class CrowdReportRepositoryImpl(
             .whereEqualTo("busId", busId)
             .get()
             .await()
-            .toObjects(CrowdReport::class.java)
+            .documents.mapNotNull { it.toCrowdReport() }
     }
 
     override fun getReportsByBusStream(busId: String): Flow<List<CrowdReport>> = callbackFlow {
@@ -50,7 +52,7 @@ class CrowdReportRepositoryImpl(
                     return@addSnapshotListener
                 }
                 if (snapshot != null) {
-                    val reports = snapshot.toObjects(CrowdReport::class.java)
+                    val reports = snapshot.documents.mapNotNull { it.toCrowdReport() }
                     trySend(reports)
                 }
             }
@@ -70,7 +72,25 @@ class CrowdReportRepositoryImpl(
             .limitToLast(1)
             .get()
             .await()
-            .toObjects(CrowdReport::class.java)
-            .firstOrNull()
+            .documents.firstOrNull()?.toCrowdReport()
+    }
+
+    private fun DocumentSnapshot.toCrowdReport(): CrowdReport? {
+        return try {
+            val reportId = getString("reportId") ?: id
+            val busId = getString("busId") ?: ""
+            val userId = getString("userId") ?: ""
+            val statusStr = getString("status") ?: CrowdStatus.BELUM_ADA_DATA.name
+            val status = try {
+                CrowdStatus.valueOf(statusStr)
+            } catch (e: Exception) {
+                CrowdStatus.BELUM_ADA_DATA
+            }
+            val timestamp = getLong("timestamp") ?: 0L
+            
+            CrowdReport(reportId, busId, userId, status, timestamp)
+        } catch (e: Exception) {
+            null
+        }
     }
 }

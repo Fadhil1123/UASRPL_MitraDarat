@@ -82,7 +82,7 @@ class MapTrackingViewModel(
             "Longgar" -> CrowdStatus.LONGGAR
             "Sedang" -> CrowdStatus.SEDANG
             "Padat" -> CrowdStatus.PADAT
-            else -> CrowdStatus.NETRAL
+            else -> CrowdStatus.BELUM_ADA_DATA
         }
 
         val color = when (statusName) {
