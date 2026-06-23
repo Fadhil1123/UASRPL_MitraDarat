@@ -22,7 +22,7 @@ import androidx.compose.foundation.clickable
 
 @Composable
 fun TemanBusScreen(
-    viewModel: TemanBusViewModel = viewModel(),
+    viewModel: TemanBusViewModel = viewModel(factory = TemanBusViewModel.Factory),
     onHomeClick: () -> Unit,
     onBusClick: () -> Unit
 ) {

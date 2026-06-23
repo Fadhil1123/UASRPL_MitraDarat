@@ -15,10 +15,18 @@ class CrowdReportRepositoryImpl(
     override suspend fun submitReport(
         report: CrowdReport
     ) {
+        val reportData = mapOf(
+            "reportId" to report.reportId,
+            "busId" to report.busId,
+            "userId" to report.userId,
+            "status" to report.status.name, // Explicitly use name for Firestore
+            "timestamp" to report.timestamp
+        )
+        
         dataSource
             .reportsCollection()
             .document(report.reportId)
-            .set(report)
+            .set(reportData)
             .await()
     }
 
