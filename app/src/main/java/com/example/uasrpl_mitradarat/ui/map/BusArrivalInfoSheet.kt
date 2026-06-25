@@ -1,6 +1,7 @@
 package com.example.uasrpl_mitradarat.ui.map
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,7 +16,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.clickable
 
 data class BusArrivalItem(
     val badgeText: String,
@@ -81,7 +81,8 @@ fun BusArrivalInfoSheet(
             ) {
                 busList.forEachIndexed { index, bus ->
                     BusArrivalRow(
-                        badgeColor = bus.badgeColor,
+                        // KUNCI UTAMA: Ubah parameter ini menjadi bus.statusColor agar badge kiri sinkron dengan tombol kanan
+                        badgeColor = bus.statusColor,
                         badgeText = bus.badgeText,
                         minutes = bus.minutes,
                         busCode = bus.busCode,
@@ -151,7 +152,7 @@ fun BusArrivalRow(
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier
                 .padding(start = 4.dp)
-                .clickable { onStatusClick() } // INI KUNCINYA!
+                .clickable { onStatusClick() }
         ) {
             Text(
                 text = "$statusText ➔",
